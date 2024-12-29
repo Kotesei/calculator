@@ -37,6 +37,7 @@ body {
     width: 100%;
     height: 150px;
     padding: .3rem;
+
 }
 
 .calc--input {
@@ -45,9 +46,12 @@ body {
     height: 100%;
     display: flex;
     justify-content: end;
+    gap: 1rem;
+    padding: 1rem;
     align-items: center;
-    font-size: 8rem;
-    padding-right: 1rem;
+    font-size: 10rem;
+
+  
 }
 
 .calc--btns {
