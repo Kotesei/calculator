@@ -1,11 +1,17 @@
 'use strict'
 const btnsContainer = document.querySelector(".calc--btns")
 const resultContainer = document.querySelector(".calc--input")
+const results = resultContainer.querySelector("p");
+
+// Total is updated after computing
+let total;
+let num;
+let num2;
 
 function resizeResult() {
     const convertToRem = window.getComputedStyle(resultContainer).fontSize.split("px")[0] / 16
     const getResultContainerPadding = Number(window.getComputedStyle(resultContainer).padding.split("px")[0] * 2)
-    const textSize = resultContainer.querySelector("p").clientWidth + getResultContainerPadding
+    const textSize = results.clientWidth + getResultContainerPadding
     let value = convertToRem
     if (value === 3) {
         console.log("Reached Size Limit");
@@ -16,8 +22,6 @@ function resizeResult() {
             resizeResult();
         }
     }
-
-   
 }
 
 function loadBtns() {
@@ -46,6 +50,32 @@ for (let btn = 0; btn < btns.length; btn++) {
 
 }
 
+// When page loads
 loadBtns();
 
+
+// Should only run after computing
 resizeResult();
+
+function add(val, val2) {}
+
+function subtract(val, val2) {}
+
+function multiply(val, val2) {}
+
+function divide(val, val2) {}
+
+// Should double tap to clear all, one tap clears the 2nd number, if 2nd number undefined then clear all
+function clear() {}
+
+// Just take the current input and switch between negative or positive
+function negPos() {}
+
+// Should turn current input into a percentage. If user just presses equal after percentage then just give divide by 100
+// Example: 300% = 3.00
+function percentage() {}
+
+// If total is defined then run operate
+function operate(operator) {
+    
+}
