@@ -60,9 +60,9 @@ function resizeResult(isReset) {
 function loadBtns() {
     let thisBtn;
 const btns = ["AC", "+/-", "%", "/", "7", "8", "9", "*", "4", "5", "6", "-", "1", "2", "3", "+", "0", ".", "="]
-const color1 = ".0123456789"
-const color2 = ["AC", "+/-", "%"]
-const color3 = ["/", "*", "-", "+", "="]
+const numerics = ".0123456789"
+const utility = ["AC", "+/-", "%"]
+const operations = ["/", "*", "-", "+", "="]
 
 for (let btn = 0; btn < btns.length; btn++) {
     btnsContainer.insertAdjacentHTML("beforeend", `<button class="btn">${btns[btn]}</button>`)    
@@ -70,14 +70,17 @@ for (let btn = 0; btn < btns.length; btn++) {
     if (thisBtn.innerHTML === "0") {
         thisBtn.style.flex = "1"
     }
-    if (color1.includes(thisBtn.innerHTML)) {
-        thisBtn.classList.add("color--numbers")
+
+    // Move all the event listeners inside here instead maybe a helper function? 
+    if (numerics.includes(thisBtn.innerHTML)) {
+        thisBtn.classList.add("color--numerics")
     }
-    if (color2.includes(thisBtn.innerHTML)) {
-        thisBtn.classList.add("color--topBtns")
+    if (utility.includes(thisBtn.innerHTML)) {
+        thisBtn.classList.add("color--utility")
     }
-    if (color3.includes(thisBtn.innerHTML)) {
+    if (operations.includes(thisBtn.innerHTML)) {
         thisBtn.classList.add("color--operators")
+
     }
 
     thisBtn.addEventListener("click", function(el) {
@@ -85,7 +88,7 @@ for (let btn = 0; btn < btns.length; btn++) {
                 clear(1);
             }
         
-        if (el.target.classList.contains("color--numbers") && !sizeLimit) {
+        if (el.target.classList.contains("color--numerics") && !sizeLimit) {
             if (input === undefined || input === "0") input = el.target.innerHTML
             else 
             input += el.target.innerHTML

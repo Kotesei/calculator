@@ -71,11 +71,11 @@ body {
     cursor: pointer;
 }
 
-.color--numbers {
+.color--numerics {
     background-color: #b38dd1;
 }
 
-.color--topBtns {
+.color--utility {
     background-color: #ffffff;
 }
 
