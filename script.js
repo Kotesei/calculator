@@ -1,13 +1,25 @@
 'use strict'
 const btnsContainer = document.querySelector(".calc--btns")
 const resultContainer = document.querySelector(".calc--input")
+
+// Display (User Input: Step 2 of 2)
 const results = resultContainer.querySelector("p");
 
-// Total is updated after computing
-let total;
+
+
+// Saves (User Input: Step 1 of 2)
 let input;
+
+// Saves the value via input here if doing any of the following: Divison, Multiplication, Subtraction, Addition can compute itself and give a result right away, for percentage just do division by 100.
 let num;
+
+// Switches to storing the input in here afterwards if num has a value already stored inside. Doing any form of operation will first, store both num, and num2 into a total then total will become num and num2 will be ready to take another input. This can happen as many times as the user wishes.
 let num2;
+
+// Total is updated after computing it takes the input and the secondary number. If pressing anything to operate on top of it, then it will go into num and start the user at num2. If user presses a number after total is received then reset everything.
+let total;
+
+// For the results not to go outside the div if it gets too big
 let sizeLimit;
 
 function resizeResult() {
