@@ -6,12 +6,15 @@ const resultContainer = document.querySelector(".calc--input")
 const results = resultContainer.querySelector("p");
 
 
-
+const originalfontSize = Number(window.getComputedStyle(results).fontSize.split("px")[0] / 16)
 // Saves (User Input: Step 1 of 2)
 let input;
 
 // Saves the value via input here if doing any of the following: Divison, Multiplication, Subtraction, Addition can compute itself and give a result right away, for percentage just do division by 100.
 let num;
+
+// Saves the current operator
+let operator;
 
 // Switches to storing the input in here afterwards if num has a value already stored inside. Doing any form of operation will first, store both num, and num2 into a total then total will become num and num2 will be ready to take another input. This can happen as many times as the user wishes.
 let num2;
@@ -22,21 +25,36 @@ let total;
 // For the results not to go outside the div if it gets too big
 let sizeLimit;
 
-function resizeResult() {
-    const convertToRem = window.getComputedStyle(resultContainer).fontSize.split("px")[0] / 16
-    const getResultContainerPadding = Number(window.getComputedStyle(resultContainer).padding.split("px")[0] * 2)
-    const textSize = results.clientWidth + getResultContainerPadding
-    let value = convertToRem
-    if (value === 3) {
+function resizeResult(isReset) {
+    const getContainerWidth = Number(window.getComputedStyle(resultContainer).width.split("px")[0])
+    const getContainerPadding = Number(window.getComputedStyle(resultContainer).padding.split("px")[0] * 2)
+    const getTextWidth = Number(window.getComputedStyle(results).width.split("px")[0])
+    const getTextFontSize = Number(window.getComputedStyle(results).fontSize.split("px")[0] / 16)
+
+    let fontSize;
+    
+    if (isReset) {
+        fontSize = originalfontSize
+        results.style.fontSize = `${fontSize}rem`
+        isReset = false
+    }
+
+    
+    if (fontSize === undefined) fontSize = getTextFontSize;
+
+    if (fontSize === 3) {
         console.log("Reached Size Limit");
         sizeLimit = true;
-    } else {
-        if (textSize > resultContainer.clientWidth) {
-            value--
-            resultContainer.style.fontSize = `${value}rem`
-            resizeResult();
-        }
     }
+    
+
+    if (getTextWidth + getContainerPadding > getContainerWidth) {
+        fontSize--
+        results.style.fontSize = `${fontSize}rem`
+        resizeResult();
+    }
+
+
 }
 
 function loadBtns() {
@@ -63,11 +81,20 @@ for (let btn = 0; btn < btns.length; btn++) {
     }
 
     thisBtn.addEventListener("click", function(el) {
-        if (sizeLimit) return
-        else
-        if (num === undefined) {
-            inputOne(el.target)
-        }
+            if (el.target.innerHTML.includes("AC")) {
+                clear(1);
+            }
+        
+        if (el.target.classList.contains("color--numbers") && !sizeLimit) {
+            if (input === undefined || input === "0") input = el.target.innerHTML
+            else 
+            input += el.target.innerHTML
+        if (input === "0") input = "0"
+        results.innerHTML = input
+        clear(0)
+        } else return
+
+       
         resizeResult();
     })
 }
@@ -79,7 +106,7 @@ loadBtns();
 
 
 // Should only run after computing
-resizeResult();
+// resizeResult();
 
 function add(val, val2) {}
 
@@ -90,27 +117,18 @@ function multiply(val, val2) {}
 function divide(val, val2) {}
 
 function inputOne(number) {
-    if (number.classList.contains("color--topBtns")) {
-        if (number.innerHTML.includes("AC")) {
-            
-            clear(1);
-        }
-    }
-    if (number.classList.contains("color--numbers")) {
-        if (input === undefined || input === "0") input = number.innerHTML
-        else 
-        input += number.innerHTML
-    if (input === "0") input = "0"
-    results.innerHTML = input
-    clear(0)
-    } else return
+    
 }
 
 
 
 // Should double tap to clear all, one tap clears the 2nd number, if 2nd number undefined then clear all
 function clear(reset) {
+    
+    
     if (reset === 1) {
+        sizeLimit = false;
+        resizeResult(true)
     if (clear.num === undefined) {
         clear.num = 0;
     }
