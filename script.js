@@ -5,8 +5,10 @@ const results = resultContainer.querySelector("p");
 
 // Total is updated after computing
 let total;
+let input;
 let num;
 let num2;
+let sizeLimit;
 
 function resizeResult() {
     const convertToRem = window.getComputedStyle(resultContainer).fontSize.split("px")[0] / 16
@@ -15,6 +17,7 @@ function resizeResult() {
     let value = convertToRem
     if (value === 3) {
         console.log("Reached Size Limit");
+        sizeLimit = true;
     } else {
         if (textSize > resultContainer.clientWidth) {
             value--
@@ -46,6 +49,15 @@ for (let btn = 0; btn < btns.length; btn++) {
     if (color3.includes(thisBtn.innerHTML)) {
         thisBtn.classList.add("color--operators")
     }
+
+    thisBtn.addEventListener("click", function(el) {
+        if (sizeLimit) return
+        else
+        if (num === undefined) {
+            inputOne(el.target)
+        }
+        resizeResult();
+    })
 }
 
 }
@@ -65,8 +77,43 @@ function multiply(val, val2) {}
 
 function divide(val, val2) {}
 
+function inputOne(number) {
+    if (number.classList.contains("color--topBtns")) {
+        if (number.innerHTML.includes("AC")) {
+            
+            clear(1);
+        }
+    }
+    if (number.classList.contains("color--numbers")) {
+        if (input === undefined || input === "0") input = number.innerHTML
+        else 
+        input += number.innerHTML
+    if (input === "0") input = "0"
+    results.innerHTML = input
+    clear(0)
+    } else return
+}
+
+
+
 // Should double tap to clear all, one tap clears the 2nd number, if 2nd number undefined then clear all
-function clear() {}
+function clear(reset) {
+    if (reset === 1) {
+    if (clear.num === undefined) {
+        clear.num = 0;
+    }
+    clear.num += 1
+    if (clear.num === 1) {
+        console.log('Clear Once');
+        results.innerHTML = "0"
+        input = "0"
+    } else if (clear.num === 2) {
+        console.log('Wipe');
+    }
+} else {
+    clear.num = 0
+}
+}
 
 // Just take the current input and switch between negative or positive
 function negPos() {}
