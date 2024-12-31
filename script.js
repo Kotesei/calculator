@@ -14,7 +14,7 @@ let input;
 let num;
 
 // Saves the current operator
-let operator;
+// let operator;
 
 // Switches to storing the input in here afterwards if num has a value already stored inside. Doing any form of operation will first, store both num, and num2 into a total then total will become num and num2 will be ready to take another input. This can happen as many times as the user wishes.
 let num2;
@@ -24,6 +24,8 @@ let total;
 
 // For the results not to go outside the div if it gets too big
 let sizeLimit;
+
+let operationDone;
 
 function resizeResult(isReset) {
     const getContainerWidth = Number(window.getComputedStyle(resultContainer).width.split("px")[0])
@@ -84,24 +86,60 @@ for (let btn = 0; btn < btns.length; btn++) {
     }
 
     thisBtn.addEventListener("click", function(el) {
+
+        // This button is for the clearing
             if (el.target.innerHTML.includes("AC")) {
+                // Clear set to true (and if pressed again then wipes this is why we use a number rather than true / false)
                 clear(1);
             }
         
+        // Checks if button pressed is a numeric one and if the sizeLimit hasn't been reached.
         if (el.target.classList.contains("color--numerics") && !sizeLimit) {
+            clear(0)
+            operationDone = false;
             if (input === undefined || input === "0") input = el.target.innerHTML
-            else 
+            else
             input += el.target.innerHTML
-        if (input === "0") input = "0"
         results.innerHTML = input
-        clear(0)
-        } else return
+    }
+    
+    // Sets the operator to use
+    if (el.target.classList.contains("color--operators")) {
+            clear(0)      
+            // Second input
+            if (num !== undefined) {
+                operate(el.target.innerHTML, true);
+            } else {
+                // First input
+                operate(el.target.innerHTML);
+            }
+        }
 
-       
         resizeResult();
     })
 }
 
+}
+
+// If total is defined then run operate
+function operate(operator, continuous) {
+    if (continuous) {
+        if (operator === "+") {
+            num2 = input ??= "0"
+            num = add(num, num2)
+            results.innerHTML = num
+            input = "0"
+            operationDone = true;
+            }
+    } else {
+        if (operator === "+") {
+            num = input ??= "0"       
+            input = "0"
+            results.innerHTML = input
+            }
+    }
+
+    
 }
 
 // When page loads
@@ -111,7 +149,9 @@ loadBtns();
 // Should only run after computing
 // resizeResult();
 
-function add(val, val2) {}
+function add(val, val2) {
+    return Number(val) + Number(val2)
+}
 
 function subtract(val, val2) {}
 
@@ -119,10 +159,9 @@ function multiply(val, val2) {}
 
 function divide(val, val2) {}
 
-function inputOne(number) {
-    
-}
+function getTotal() {
 
+}
 
 
 // Should double tap to clear all, one tap clears the 2nd number, if 2nd number undefined then clear all
@@ -136,11 +175,23 @@ function clear(reset) {
         clear.num = 0;
     }
     clear.num += 1
-    if (clear.num === 1) {
+    if (clear.num === 1 && !operationDone) {
         console.log('Clear Once');
+        if (num !== undefined) {
+            console.log(num2);
+            num2 = undefined
+        } else {
+            console.log(num);
+            num = undefined
+        }
         results.innerHTML = "0"
         input = "0"
-    } else if (clear.num === 2) {
+    } else if (clear.num === 2 || operationDone) {
+        num = undefined;
+        num2 = undefined;
+        total = undefined;
+        input = "0"
+        results.innerHTML = input
         console.log('Wipe');
     }
 } else {
@@ -155,7 +206,3 @@ function negPos() {}
 // Example: 300% = 3.00
 function percentage() {}
 
-// If total is defined then run operate
-function operate(operator) {
-    
-}
