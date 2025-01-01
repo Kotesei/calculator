@@ -196,7 +196,7 @@ function updateScreen() {
 
 
 
-function getTotal(isDuring) {
+function getTotal(isDuring, operator) {
     console.log(num, num2, total);
     if (isDuring === "Repeat") {
         console.log("Repeat Operation!");
@@ -208,11 +208,18 @@ function getTotal(isDuring) {
             case "-":
                 total = subtract(total, storeNum2)
                 break;
+            case "*":
+                total = multiply(total, storeNum2)
+                break;
+            case "/":
+                total = divide(total, storeNum2)
+                break;
             }
     } else if (!isDuring){
         console.log("Results!");
         storeNum2 = num2
         num2 = input
+        if (!lastUsedOperator) total = input
         switch (lastUsedOperator) {
             case "+":
                 total = add(num, num2)
@@ -220,16 +227,33 @@ function getTotal(isDuring) {
             case "-":
                 total = subtract(num, num2)
                 break;
+            case "*":
+                total = multiply(num, num2)
+                break;
+            case "/":
+                total = divide(num, num2)
+                break;
         }
         
     } else if (isDuring === "Continue") {
         console.log("Continue Operation!");
+        console.log(lastUsedOperator, operator);
         switch (lastUsedOperator) {
-            case "+":
-                total = add(num, num2)
-                break;
+                case "+":
+                    total = add(num, num2)
+                    break;
                 case "-":
                     total = subtract(num, num2)
+                    break;
+                case "*":
+                    // Set to 1 so it doesn't change
+                    if (input === "0") num2 = 1
+                    total = multiply(num, num2)
+                    break;
+                case "/":
+                    // Set to 1 so it doesn't change
+                    if (input === "0") num2 = 1
+                    total = divide(num, num2)
                     break;
                 }
             }
@@ -285,6 +309,8 @@ function clear(reset) {
         num = undefined;
         num2 = undefined;
         total = undefined;
+        isContinuing = false
+        operationDone = false
         updateScreen();
         console.log('Wipe');
     }
