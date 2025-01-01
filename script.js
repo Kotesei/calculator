@@ -25,6 +25,7 @@ let total;
 // For the results not to go outside the div if it gets too big
 let sizeLimit;
 
+// Checks if user is looking at results or continuing
 let operationDone;
 
 function resizeResult(isReset) {
@@ -178,10 +179,8 @@ function clear(reset) {
     if (clear.num === 1 && !operationDone) {
         console.log('Clear Once');
         if (num !== undefined) {
-            console.log(num2);
             num2 = undefined
         } else {
-            console.log(num);
             num = undefined
         }
         results.innerHTML = "0"
