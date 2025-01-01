@@ -13,11 +13,14 @@ let input;
 // Saves the value via input here if doing any of the following: Divison, Multiplication, Subtraction, Addition can compute itself and give a result right away, for percentage just do division by 100.
 let num;
 
-// Saves the current operator
-// let operator;
+// Saves the last operator
+let prevOperator;
+let repeatOperation = 0;
+let isNumber;
 
 // Switches to storing the input in here afterwards if num has a value already stored inside. Doing any form of operation will first, store both num, and num2 into a total then total will become num and num2 will be ready to take another input. This can happen as many times as the user wishes.
 let num2;
+let storeNum2;
 
 // Total is updated after computing it takes the input and the secondary number. If pressing anything to operate on top of it, then it will go into num and start the user at num2. If user presses a number after total is received then reset everything.
 let total;
@@ -27,6 +30,7 @@ let sizeLimit;
 
 // Checks if user is looking at results or continuing
 let operationDone;
+
 
 function resizeResult(isReset) {
     const getContainerWidth = Number(window.getComputedStyle(resultContainer).width.split("px")[0])
@@ -98,6 +102,7 @@ for (let btn = 0; btn < btns.length; btn++) {
         if (el.target.classList.contains("color--numerics") && !sizeLimit) {
             clear(0)
             operationDone = false;
+            isNumber = true;
             if (input === undefined || input === "0") input = el.target.innerHTML
             else
             input += el.target.innerHTML
@@ -122,26 +127,115 @@ for (let btn = 0; btn < btns.length; btn++) {
 
 }
 
-// If total is defined then run operate
+
+// Fix this code up
+
 function operate(operator, continuous) {
-    if (continuous) {
-        if (operator === "+") {
-            num2 = input ??= "0"
-            num = add(num, num2)
-            results.innerHTML = num
+    if (operator === "=") {
+        if (repeatOperation !== 2) {
+            repeatOperation++             
+        }
+
+        if (repeatOperation === 2) {
+            num2 = input
             input = "0"
-            operationDone = true;
+            if (prevOperator === "+") total = add(total, storeNum2)
+            if (prevOperator === "-") total = subtract(total, storeNum2)
+            if (prevOperator === "*") total = multiply(total, storeNum2)
+            results.innerHTML = total
+        }
+if (repeatOperation !== 2) {
+        if (prevOperator === "+") {
+            if (!isNumber) {
+                storeNum2 = total
+                total = add(total, total)
+            } else {
+                num2 = input
+                storeNum2 = num2
+                input = "0"
+                if (total !== undefined) total = add(total, num2)
+                    else total = add(num, num2)
             }
-    } else {
-        if (operator === "+") {
-            num = input ??= "0"       
-            input = "0"
-            results.innerHTML = input
+            results.innerHTML = total
+            isNumber = false;
+           
+        }
+
+        if (prevOperator === "-") {
+            if (!isNumber) {
+                storeNum2 = total
+                total = subtract(total, total)
+            } else {
+                num2 = input
+                storeNum2 = num2
+                input = "0"
+                if (total !== undefined) total = subtract(total, num2)
+                    else total = subtract(num, num2)
             }
+            results.innerHTML = total
+            isNumber = false;
+           
+        }
+
+        if (prevOperator === "*") {
+            if (!isNumber) {
+                storeNum2 = total
+                total = multiply(total, total)
+            } else {
+                num2 = input
+                storeNum2 = num2
+                input = "0"
+                if (total !== undefined) total = multiply(total, num2)
+                    else total = multiply(num, num2)
+            }
+            results.innerHTML = total
+            isNumber = false;
+           
+        }
+    }
+        
     }
 
+    if (operator !== "=") repeatOperation = 0;
     
+    if (continuous && operator !== "=") {       
+        prevOperator = operator
+
+
+        if (operator === "+") {
+            num2 = input
+            input = "0"
+            if (total !== undefined) total = add(total, num2)
+                else total = add(num, num2)
+            results.innerHTML = total
+        }
+
+        if (operator === "-") {
+            num2 = input
+            input = "0"
+            if (total !== undefined) total = subtract(total, num2)
+                else total = subtract(num, num2)
+            results.innerHTML = total
+        }
+
+        if (operator === "*") {
+            num2 = input
+            input = "0"
+            if (total !== undefined) total = multiply(total, num2)
+                else total = multiply(num, num2)
+            results.innerHTML = total
+        }
+    }
+    
+    if (!continuous && operator !== "=") {
+        prevOperator = operator
+        num = input
+        input = "0"
+    }
+ 
 }
+
+
 
 // When page loads
 loadBtns();
@@ -154,9 +248,13 @@ function add(val, val2) {
     return Number(val) + Number(val2)
 }
 
-function subtract(val, val2) {}
+function subtract(val, val2) {
+    return Number(val) - Number(val2)
+}
 
-function multiply(val, val2) {}
+function multiply(val, val2) {
+    return Number(val) * Number(val2)
+}
 
 function divide(val, val2) {}
 
