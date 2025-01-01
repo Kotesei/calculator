@@ -18,6 +18,7 @@ let lastUsedOperator;
 
 // Stores the second value
 let num2;
+let storeNum2
 
 // After num, lastUsedOperator, and num2 have values run the functions and store it in total
 let total;
@@ -152,25 +153,66 @@ for (let btn = 0; btn < btns.length; btn++) {
 // If true then repeat operation based off of lastUsedOperator 
 
 function operate(operator) {
+    if (!num) num = input
+    if (num) num2 = input
+if (operator === "=") {
+    if (!num) total = 0
+    // If operationDone then repeat last one
+    if (operationDone) {
+        getTotal("Repeat")
+    } else {
+        getTotal();
+        isContinuing = false;
+    }
+    operationDone = true;
+    updateScreen()
+}
+if (operator !== "=") {
+    // If operationDone then turn num into total and getTotal
+    if (operationDone) {
+        console.log("Continue after pressing equal");
+    }
+    if (isContinuing) {
+        console.log(num, num2, total);
+        getTotal("Continue", operator)
+        console.log(num, num2, total);
+        operationDone = false
+    }
+    lastUsedOperator = operator
+    updateScreen()
+    isContinuing = true;
+}
 
 }
 
+function updateScreen() {
+    input = "0"
+    if (isContinuing) input = total
+    if (operationDone) input = total
+    // console.log(isContinuing, operationDone);
+        results.innerHTML = input
+        input = "0"
+    }
 
 
-function getTotal(isDuring, operator) {
+
+function getTotal(isDuring) {
+    console.log(num, num2, total);
     if (isDuring === "Repeat") {
         console.log("Repeat Operation!");
-        total ??= num
+        num = total
         switch (lastUsedOperator) {
             case "+":
-                total = add(total, num2)
+                total = add(total, storeNum2)
                 break;
             case "-":
-                total = subtract(total, num2)
+                total = subtract(total, storeNum2)
                 break;
             }
     } else if (!isDuring){
         console.log("Results!");
+        storeNum2 = num2
+        num2 = input
         switch (lastUsedOperator) {
             case "+":
                 total = add(num, num2)
@@ -182,17 +224,16 @@ function getTotal(isDuring, operator) {
         
     } else if (isDuring === "Continue") {
         console.log("Continue Operation!");
-        num = total
-        num2 = input;
-        switch (operator) {
+        switch (lastUsedOperator) {
             case "+":
                 total = add(num, num2)
                 break;
-            case "-":
-                total = subtract(num, num2)
-                break;
-        }
-    }
+                case "-":
+                    total = subtract(num, num2)
+                    break;
+                }
+            }
+            num = total
     
     }
 
@@ -220,14 +261,6 @@ function divide(val, val2) {
     return Number(val) / Number(val2)
 }
 
-
-
-function updateScreen() {
-    if (isContinuing) input = total
-    else input = "0"
-        results.innerHTML = input
-        input = "0"
-    }
 
 // Should double tap to clear all, one tap clears the 2nd number, if 2nd number undefined then clear all
 function clear(reset) {
