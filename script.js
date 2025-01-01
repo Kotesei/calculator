@@ -25,9 +25,11 @@ let total;
 // Enable this after pressing equal 
 let operationDone;
 
-// If true then repeat operation based off of lastUsedOperator 
-let repeatOperation;
-let isNumber;
+// Specifically for the equal sign repeats the last action
+let isRepeating;
+
+// Specifically for every other operator, takes total and turns it to num instead
+let isContinuing
 
 // For the results not to go outside the div if it gets too big
 let sizeLimit;
@@ -105,7 +107,6 @@ for (let btn = 0; btn < btns.length; btn++) {
         if (el.target.classList.contains("color--numerics") && !sizeLimit) {
             clear(0)
             operationDone = false;
-            isNumber = true;
             if (input === undefined || input === "0") input = el.target.innerHTML
             else
             input += el.target.innerHTML
@@ -133,78 +134,66 @@ for (let btn = 0; btn < btns.length; btn++) {
 
 // Fix this code up
 
-function operate(operator) {
-// Checks if num has a value
-if (num) {
-    // Stores the second value if first has a value
-    num2 ??= input
-    // Stores the first value
-} else num ??= input
-
-// Grab the operator used other than the equal sign
-if (operator !== "=") {
-    if (operationDone) {
-        getTotal("Continue", operator);
-    }
-    operationDone = false;
-    lastUsedOperator = operator
-    updateScreen()
-}
-
-// Equal is pressed
-if (operator === "=") {
-    if (operationDone) {
-        getTotal("Repeat")
-    } else {
-        getTotal()
-    }
-}
-
 
 // Saves the last operator except equal
-
-// Stores the second value
-
-// After num, lastUsedOperator, and num2 have values run the functions and store it in total
+// let lastUsedOperator;
 
 // Enable this after pressing equal 
+// let operationDone;
 
+// Specifically for the equal sign repeats the last action
+// let isRepeating;
+
+// Specifically for every other operator, takes total and turns it to num instead
+// let isContinuing
+
+// Enable this after pressing equal 
+// operationDone = true;
 // If true then repeat operation based off of lastUsedOperator 
 
-
-// For the results not to go outside the div if it gets too big
+function operate(operator) {
 
 }
 
+
+
 function getTotal(isDuring, operator) {
-    operationDone = true;
     if (isDuring === "Repeat") {
         console.log("Repeat Operation!");
+        total ??= num
         switch (lastUsedOperator) {
             case "+":
                 total = add(total, num2)
                 break;
-        }
+            case "-":
+                total = subtract(total, num2)
+                break;
+            }
     } else if (!isDuring){
         console.log("Results!");
         switch (lastUsedOperator) {
             case "+":
                 total = add(num, num2)
                 break;
+            case "-":
+                total = subtract(num, num2)
+                break;
         }
         
     } else if (isDuring === "Continue") {
         console.log("Continue Operation!");
         num = total
-        num2 = undefined;
-        console.log(total, num, num2);
+        num2 = input;
         switch (operator) {
             case "+":
                 total = add(num, num2)
                 break;
+            case "-":
+                total = subtract(num, num2)
+                break;
         }
     }
-    updateScreen(total)
+    
     }
 
 
@@ -233,10 +222,11 @@ function divide(val, val2) {
 
 
 
-function updateScreen(display) {
-        if (display) input = display
-        else input = "0"
+function updateScreen() {
+    if (isContinuing) input = total
+    else input = "0"
         results.innerHTML = input
+        input = "0"
     }
 
 // Should double tap to clear all, one tap clears the 2nd number, if 2nd number undefined then clear all
