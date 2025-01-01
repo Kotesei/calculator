@@ -10,26 +10,29 @@ const originalfontSize = Number(window.getComputedStyle(results).fontSize.split(
 // Saves (User Input: Step 1 of 2)
 let input;
 
-// Saves the value via input here if doing any of the following: Divison, Multiplication, Subtraction, Addition can compute itself and give a result right away, for percentage just do division by 100.
+// Stores the first value
 let num;
 
-// Saves the last operator
-let prevOperator;
-let repeatOperation = 0;
-let isNumber;
+// Saves the last operator except equal
+let lastUsedOperator;
 
-// Switches to storing the input in here afterwards if num has a value already stored inside. Doing any form of operation will first, store both num, and num2 into a total then total will become num and num2 will be ready to take another input. This can happen as many times as the user wishes.
+// Stores the second value
 let num2;
-let storeNum2;
 
-// Total is updated after computing it takes the input and the secondary number. If pressing anything to operate on top of it, then it will go into num and start the user at num2. If user presses a number after total is received then reset everything.
+// After num, lastUsedOperator, and num2 have values run the functions and store it in total
 let total;
+
+// Enable this after pressing equal 
+let operationDone;
+
+// If true then repeat operation based off of lastUsedOperator 
+let repeatOperation;
+let isNumber;
 
 // For the results not to go outside the div if it gets too big
 let sizeLimit;
 
-// Checks if user is looking at results or continuing
-let operationDone;
+
 
 
 function resizeResult(isReset) {
@@ -130,111 +133,65 @@ for (let btn = 0; btn < btns.length; btn++) {
 
 // Fix this code up
 
-function operate(operator, continuous) {
-    if (operator === "=") {
-        if (repeatOperation !== 2) {
-            repeatOperation++             
-        }
+function operate(operator) {
+// Checks if num has a value
+if (num) {
+    // Stores the second value if first has a value
+    num2 ??= input
+    // Stores the first value
+} else num ??= input
 
-        if (repeatOperation === 2) {
-            num2 = input
-            input = "0"
-            if (prevOperator === "+") total = add(total, storeNum2)
-            if (prevOperator === "-") total = subtract(total, storeNum2)
-            if (prevOperator === "*") total = multiply(total, storeNum2)
-            results.innerHTML = total
-        }
-if (repeatOperation !== 2) {
-        if (prevOperator === "+") {
-            if (!isNumber) {
-                storeNum2 = total
-                total = add(total, total)
-            } else {
-                num2 = input
-                storeNum2 = num2
-                input = "0"
-                if (total !== undefined) total = add(total, num2)
-                    else total = add(num, num2)
-            }
-            results.innerHTML = total
-            isNumber = false;
-           
-        }
-
-        if (prevOperator === "-") {
-            if (!isNumber) {
-                storeNum2 = total
-                total = subtract(total, total)
-            } else {
-                num2 = input
-                storeNum2 = num2
-                input = "0"
-                if (total !== undefined) total = subtract(total, num2)
-                    else total = subtract(num, num2)
-            }
-            results.innerHTML = total
-            isNumber = false;
-           
-        }
-
-        if (prevOperator === "*") {
-            if (!isNumber) {
-                storeNum2 = total
-                total = multiply(total, total)
-            } else {
-                num2 = input
-                storeNum2 = num2
-                input = "0"
-                if (total !== undefined) total = multiply(total, num2)
-                    else total = multiply(num, num2)
-            }
-            results.innerHTML = total
-            isNumber = false;
-           
-        }
-    }
-        
-    }
-
-    if (operator !== "=") repeatOperation = 0;
-    
-    if (continuous && operator !== "=") {       
-        prevOperator = operator
-
-
-        if (operator === "+") {
-            num2 = input
-            input = "0"
-            if (total !== undefined) total = add(total, num2)
-                else total = add(num, num2)
-            results.innerHTML = total
-        }
-
-        if (operator === "-") {
-            num2 = input
-            input = "0"
-            if (total !== undefined) total = subtract(total, num2)
-                else total = subtract(num, num2)
-            results.innerHTML = total
-        }
-
-        if (operator === "*") {
-            num2 = input
-            input = "0"
-            if (total !== undefined) total = multiply(total, num2)
-                else total = multiply(num, num2)
-            results.innerHTML = total
-        }
-    }
-    
-    if (!continuous && operator !== "=") {
-        prevOperator = operator
-        num = input
-        input = "0"
-    }
- 
+// Grab the operator used other than the equal sign
+if (operator !== "=") {
+    operationDone = false;
+    lastUsedOperator = operator
+    updateScreen()
 }
 
+// Equal is pressed
+if (operator === "=") {
+    if (operationDone) {
+        getTotal(true)
+        console.log("test2");
+    } else {
+        getTotal()
+        console.log("test");
+    }
+}
+
+
+// Saves the last operator except equal
+
+// Stores the second value
+
+// After num, lastUsedOperator, and num2 have values run the functions and store it in total
+
+// Enable this after pressing equal 
+
+// If true then repeat operation based off of lastUsedOperator 
+
+
+// For the results not to go outside the div if it gets too big
+
+}
+
+function getTotal(isRepeat) {
+    operationDone = true;
+    if (isRepeat) {
+        console.log("Repeat Operation!");
+        // console.log(lastUsedOperator, num2);
+    } else {
+        // console.log(num, lastUsedOperator, num2);
+        switch (lastUsedOperator) {
+            case "+":
+                total = add(num, num2)
+                
+                break;
+        }
+        
+    }
+    updateScreen(total)
+    }
 
 
 // When page loads
@@ -256,12 +213,17 @@ function multiply(val, val2) {
     return Number(val) * Number(val2)
 }
 
-function divide(val, val2) {}
-
-function getTotal() {
-
+function divide(val, val2) {
+    return Number(val) / Number(val2)
 }
 
+
+
+function updateScreen(display) {
+        if (display) input = display
+        else input = "0"
+        results.innerHTML = input
+    }
 
 // Should double tap to clear all, one tap clears the 2nd number, if 2nd number undefined then clear all
 function clear(reset) {
@@ -281,14 +243,12 @@ function clear(reset) {
         } else {
             num = undefined
         }
-        results.innerHTML = "0"
-        input = "0"
+        updateScreen();
     } else if (clear.num === 2 || operationDone) {
         num = undefined;
         num2 = undefined;
         total = undefined;
-        input = "0"
-        results.innerHTML = input
+        updateScreen();
         console.log('Wipe');
     }
 } else {
