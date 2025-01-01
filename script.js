@@ -143,6 +143,9 @@ if (num) {
 
 // Grab the operator used other than the equal sign
 if (operator !== "=") {
+    if (operationDone) {
+        getTotal("Continue", operator);
+    }
     operationDone = false;
     lastUsedOperator = operator
     updateScreen()
@@ -151,11 +154,9 @@ if (operator !== "=") {
 // Equal is pressed
 if (operator === "=") {
     if (operationDone) {
-        getTotal(true)
-        console.log("test2");
+        getTotal("Repeat")
     } else {
         getTotal()
-        console.log("test");
     }
 }
 
@@ -175,20 +176,33 @@ if (operator === "=") {
 
 }
 
-function getTotal(isRepeat) {
+function getTotal(isDuring, operator) {
     operationDone = true;
-    if (isRepeat) {
+    if (isDuring === "Repeat") {
         console.log("Repeat Operation!");
-        // console.log(lastUsedOperator, num2);
-    } else {
-        // console.log(num, lastUsedOperator, num2);
+        switch (lastUsedOperator) {
+            case "+":
+                total = add(total, num2)
+                break;
+        }
+    } else if (!isDuring){
+        console.log("Results!");
         switch (lastUsedOperator) {
             case "+":
                 total = add(num, num2)
-                
                 break;
         }
         
+    } else if (isDuring === "Continue") {
+        console.log("Continue Operation!");
+        num = total
+        num2 = undefined;
+        console.log(total, num, num2);
+        switch (operator) {
+            case "+":
+                total = add(num, num2)
+                break;
+        }
     }
     updateScreen(total)
     }
