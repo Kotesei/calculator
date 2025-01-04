@@ -195,12 +195,11 @@ if (operator !== "=") {
 }
 
 function updateScreen() {
-    input = "0"
     if (isContinuing) input = total
     if (operationDone) input = total
-    // console.log(isContinuing, operationDone);
-        results.innerHTML = input
-        input = "0"
+    if (!total) input = "0"
+    results.innerHTML = input
+    input = "0"
     }
 
 
@@ -298,7 +297,6 @@ function divide(val, val2) {
 // Should double tap to clear all, one tap clears the 2nd number, if 2nd number undefined then clear all
 function clear(reset) {
     
-    
     if (reset === 1) {
         sizeLimit = false;
         resizeResult(true)
@@ -313,6 +311,7 @@ function clear(reset) {
         } else {
             num = undefined
         }
+
         updateScreen();
     } else if (clear.num === 2 || operationDone) {
         num = undefined;
