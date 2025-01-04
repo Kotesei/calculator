@@ -10,6 +10,8 @@ const originalfontSize = Number(window.getComputedStyle(results).fontSize.split(
 // Saves (User Input: Step 1 of 2)
 let input;
 
+let isNegative;
+
 // Stores the first value
 let num;
 
@@ -22,6 +24,8 @@ let storeNum2
 
 // After num, lastUsedOperator, and num2 have values run the functions and store it in total
 let total;
+
+let isInputting;
 
 // Enable this after pressing equal 
 let operationDone;
@@ -97,17 +101,19 @@ for (let btn = 0; btn < btns.length; btn++) {
     }
 
     thisBtn.addEventListener("click", function(el) {
-
+        
         // This button is for the clearing
             if (el.target.innerHTML.includes("AC")) {
                 // Clear set to true (and if pressed again then wipes this is why we use a number rather than true / false)
                 clear(1);
             }
+            if (el.target.innerHTML.includes("+/-")) turnToNegative();
         
         // Checks if button pressed is a numeric one and if the sizeLimit hasn't been reached.
         if (el.target.classList.contains("color--numerics") && !sizeLimit) {
             clear(0)
             operationDone = false;
+            isInputting = true;
             if (input === undefined || input === "0") input = el.target.innerHTML
             else
             input += el.target.innerHTML
@@ -116,6 +122,7 @@ for (let btn = 0; btn < btns.length; btn++) {
     
     // Sets the operator to use
     if (el.target.classList.contains("color--operators")) {
+        isInputting = false;
             clear(0)      
             // Second input
             if (num !== undefined) {
@@ -171,11 +178,13 @@ if (operator !== "=") {
     // If operationDone then turn num into total and getTotal
     if (operationDone) {
         console.log("Continue after pressing equal");
+        operationDone = false
     }
     if (isContinuing) {
         console.log(num, num2, total);
         getTotal("Continue", operator)
         console.log(num, num2, total);
+        
         operationDone = false
     }
     lastUsedOperator = operator
@@ -319,8 +328,30 @@ function clear(reset) {
 }
 }
 
+let storePositive;
 // Just take the current input and switch between negative or positive
-function negPos() {}
+function turnToNegative() {
+    if (!isInputting || results.innerHTML === "0") return
+    if (Number(results.innerHTML) < 0) isNegative = true
+    else isNegative = false
+
+
+    if (isNegative) {
+        isNegative = false
+        storePositive ??= results.innerHTML.split("-")[1]
+        input = `${storePositive}`
+        console.log("Turn to positive");
+        console.log(num, num2, total);
+    } else
+    if (!isNegative) {
+        isNegative = true
+        storePositive = input
+        input = `-${input}`
+        console.log(num, num2, total);
+        console.log("Turn to negative");
+    }
+results.innerHTML = input
+}
 
 // Should turn current input into a percentage. If user just presses equal after percentage then just give divide by 100
 // Example: 300% = 3.00
