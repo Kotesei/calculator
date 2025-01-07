@@ -108,6 +108,8 @@ for (let btn = 0; btn < btns.length; btn++) {
                 clear(1);
             }
             if (el.target.innerHTML.includes("+/-")) turnToNegative();
+
+            if (el.target.innerHTML.includes("%")) percentage();
         
         // Checks if button pressed is a numeric one and if the sizeLimit hasn't been reached.
         if (el.target.classList.contains("color--numerics") && !sizeLimit) {
@@ -160,8 +162,7 @@ for (let btn = 0; btn < btns.length; btn++) {
 // If true then repeat operation based off of lastUsedOperator 
 
 function operate(operator) {
-    if (!num) num = input
-    if (num) num2 = input
+    num ??= input
 if (operator === "=") {
     if (!num) total = 0
     // If operationDone then repeat last one
@@ -205,30 +206,33 @@ function updateScreen() {
 
 
 function getTotal(isDuring, operator) {
+    num2 ??= input
     console.log(num, num2, total);
     if (isDuring === "Repeat") {
         console.log("Repeat Operation!");
+        if (isPercent) console.log("Test");
         num = total
         switch (lastUsedOperator) {
             case "+":
                 total = add(total, storeNum2)
                 break;
-            case "-":
-                total = subtract(total, storeNum2)
-                break;
-            case "*":
-                total = multiply(total, storeNum2)
-                break;
-            case "/":
-                total = divide(total, storeNum2)
-                break;
-            }
-    } else if (!isDuring){
-        console.log("Results!");
-        storeNum2 = num2
-        num2 = input
-        if (!lastUsedOperator) total = input
-        switch (lastUsedOperator) {
+                case "-":
+                    total = subtract(total, storeNum2)
+                    break;
+                    case "*":
+                        total = multiply(total, storeNum2)
+                        break;
+                        case "/":
+                            total = divide(total, storeNum2)
+                            break;
+                        }
+                    } else if (!isDuring){
+                        console.log("Results!");
+                        storeNum2 = num2
+                        if (!isPercent) num2 = input
+                        if (!lastUsedOperator) total = input
+                        if (isPercent) total = num;
+                        switch (lastUsedOperator) {
             case "+":
                 total = add(num, num2)
                 break;
@@ -354,5 +358,15 @@ results.innerHTML = input
 
 // Should turn current input into a percentage. If user just presses equal after percentage then just give divide by 100
 // Example: 300% = 3.00
-function percentage() {}
+let isPercent;
+let lastPercent;
+function percentage() {
+    console.log(isContinuing);
+    if (isContinuing) num2 = (num * (input / 100)).toFixed(2)
+        else num = input / 100
+    isPercent = true;
+    results.innerHTML = `${results.innerHTML}%`
+    console.log(num, num2);
+    console.log(input);
+}
 
