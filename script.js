@@ -33,6 +33,8 @@ for (let btn = 0; btn < btns.length; btn++) {
     if (numerics.includes(thisBtn.innerHTML)) {
                 thisBtn.classList.add("color--numerics")
                 thisBtn.addEventListener("click", function(e) {
+                    if (sizeLimit) return
+                    if (doneOperating) clear();
                     
                     if (isOperating) {
                         if (!num2 && e.target.innerHTML === "0") return
@@ -46,7 +48,6 @@ for (let btn = 0; btn < btns.length; btn++) {
                     num = num ? num + e.target.innerHTML : e.target.innerHTML;
                     if (results.innerHTML === ".") results.innerHTML = "0."
                     results.innerHTML = num
-                    console.log(num);
                 }
                 resizeResult()
                 })
@@ -60,8 +61,19 @@ for (let btn = 0; btn < btns.length; btn++) {
                             clear();
                         break;
                         case "+/-":
+                            if (sizeLimit) return
+                            invertNumber();
+                            if (num && !num2) {
+                                num = results.innerHTML;
+                                console.log(num, num2);
+                            }
+                            else {
+                                num2 = results.innerHTML
+                                console.log(num, num2);
+                            }
                         break;
                         case "%":
+                            if (sizeLimit) return
                         break;
                     }
                 })
@@ -69,6 +81,7 @@ for (let btn = 0; btn < btns.length; btn++) {
             if (operations.includes(thisBtn.innerHTML)) {
                 thisBtn.classList.add("color--operators")
                 thisBtn.addEventListener("click", function(e) {
+                    if (sizeLimit) return
 
                     // For operation add, multi, divide, sub
                     if (e.target.innerHTML !== "=") {
@@ -105,10 +118,9 @@ for (let btn = 0; btn < btns.length; btn++) {
                         if (!num) num = 0
                         if (!num2) num2 = 0
                         // Calculates the total
-                        else total = calc(num, operation, num2)
+                        total = calc(num, operation, num2)
                         if (!isFinite(calc(num, operation, num2))) total = Infinity
-                        console.log(num, operation, num2);
-                        if (!operation || !total) total = num
+                        if (!operation || total === undefined) total = num
                     results.innerHTML = total
                     doneOperating = true;
                     }
@@ -151,13 +163,14 @@ function resizeResult(isReset) {
         fontSize = originalfontSize
         results.style.fontSize = `${fontSize}rem`
         isReset = false
+        sizeLimit = false;
     }
 
     
     if (fontSize === undefined) fontSize = getTextFontSize;
 
     if (fontSize === 3) {
-        console.log("Reached Size Limit");
+        results.innerHTML = "Size Limit!"
         sizeLimit = true;
     }
     
@@ -206,6 +219,13 @@ function clear() {
         num2 = undefined;
         results.innerHTML = "0"
     }
+    resizeResult(true)
+}
+
+function invertNumber() {
+    if (results.innerHTML === "0") return
+    if (results.innerHTML.includes("-")) results.innerHTML = results.innerHTML.split("-")[1]
+    else results.innerHTML = "-" + results.innerHTML
 }
 
 
