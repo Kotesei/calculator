@@ -10,6 +10,7 @@ const originalfontSize = Number(window.getComputedStyle(results).fontSize.split(
 
 let operation;
 let isOperating
+let canOperate;
 let num;
 let num2;
 let total;
@@ -32,12 +33,20 @@ for (let btn = 0; btn < btns.length; btn++) {
     if (numerics.includes(thisBtn.innerHTML)) {
                 thisBtn.classList.add("color--numerics")
                 thisBtn.addEventListener("click", function(e) {
+                    
                     if (isOperating) {
+                        if (!num2 && e.target.innerHTML === "0") return
                         num2 = num2 ? num2 + e.target.innerHTML : e.target.innerHTML;
                         results.innerHTML = num2
                     } else {
+                        if (!num && e.target.innerHTML === "0") return
+          
+                        
+                        
                     num = num ? num + e.target.innerHTML : e.target.innerHTML;
+                    if (results.innerHTML === ".") results.innerHTML = "0."
                     results.innerHTML = num
+                    console.log(num);
                 }
                 })
             }
@@ -52,21 +61,30 @@ for (let btn = 0; btn < btns.length; btn++) {
                     if (e.target.innerHTML !== "=") {
                         
                         if (isOperating) {
-                            // Should calculate here and continue.
+                            if (!num) num = 0
+                        if (!num2) num2 = 0
+                        // Should calculate here and continue.
+                        if (num === 0 && num2 === 0) {
+                        } else {
                             total = calc(num, operation, num2)
                             results.innerHTML = total
                             num = total
                             num2 = 0
                         }
+                            
+                            console.log("test2");
+                        }
                         else {
+                            if (!num) num = 0
+                            
                             // isOperating ensures input stays on num2 and num is left untouched, should only be false if clearing.
                             isOperating = true;
                             results.innerHTML = "0"
                             repeatTotal = false;
                             
+                            console.log("test");
                         }
                         operation = e.target.innerHTML  
-                        console.log(operation);
                     }
 
                     // For pressing equal
@@ -74,8 +92,14 @@ for (let btn = 0; btn < btns.length; btn++) {
                         if (repeatTotal) {
                             num = total
                         }
+                        // Return num as the total if no num2 found
+                        if (!num) num = 0
+                        if (!num2) num2 = 0
                         // Calculates the total
-                    total = calc(num, operation, num2)
+                        else total = calc(num, operation, num2)
+                        if (!isFinite(calc(num, operation, num2))) total = Infinity
+                        console.log(num, operation, num2);
+                        if (!operation || !total) total = num
                     results.innerHTML = total
                     repeatTotal = true;
                     }
