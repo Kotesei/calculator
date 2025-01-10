@@ -48,7 +48,9 @@ for (let btn = 0; btn < btns.length; btn++) {
                     results.innerHTML = num
                     console.log(num);
                 }
+                resizeResult()
                 })
+               
             }
             if (utility.includes(thisBtn.innerHTML)) {
                 thisBtn.classList.add("color--utility")
@@ -71,8 +73,6 @@ for (let btn = 0; btn < btns.length; btn++) {
                             num = total
                             num2 = 0
                         }
-                            
-                            console.log("test2");
                         }
                         else {
                             if (!num) num = 0
@@ -81,8 +81,6 @@ for (let btn = 0; btn < btns.length; btn++) {
                             isOperating = true;
                             results.innerHTML = "0"
                             repeatTotal = false;
-                            
-                            console.log("test");
                         }
                         operation = e.target.innerHTML  
                     }
@@ -103,7 +101,9 @@ for (let btn = 0; btn < btns.length; btn++) {
                     results.innerHTML = total
                     repeatTotal = true;
                     }
-                })
+                    resizeResult()
+                }
+            )
             }
         }
 }
@@ -123,6 +123,39 @@ function calc(num, operation, num2) {
         case "*":
         return Number(num) * Number(num2);
     }
+}
+
+let sizeLimit;
+function resizeResult(isReset) {
+    const getContainerWidth = Number(window.getComputedStyle(resultContainer).width.split("px")[0])
+    const getContainerPadding = Number(window.getComputedStyle(resultContainer).padding.split("px")[0] * 2)
+    const getTextWidth = Number(window.getComputedStyle(results).width.split("px")[0])
+    const getTextFontSize = Number(window.getComputedStyle(results).fontSize.split("px")[0] / 16)
+
+    let fontSize;
+    
+    if (isReset) {
+        fontSize = originalfontSize
+        results.style.fontSize = `${fontSize}rem`
+        isReset = false
+    }
+
+    
+    if (fontSize === undefined) fontSize = getTextFontSize;
+
+    if (fontSize === 3) {
+        console.log("Reached Size Limit");
+        sizeLimit = true;
+    }
+    
+
+    if (getTextWidth + getContainerPadding > getContainerWidth) {
+        fontSize--
+        results.style.fontSize = `${fontSize}rem`
+        resizeResult();
+    }
+
+
 }
 
 // Saves (User Input: Step 1 of 2)
