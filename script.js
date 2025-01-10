@@ -14,7 +14,7 @@ let canOperate;
 let num;
 let num2;
 let total;
-let repeatTotal;
+let doneOperating;
 
 function loadBtns() {
 let thisBtn;
@@ -54,6 +54,17 @@ for (let btn = 0; btn < btns.length; btn++) {
             }
             if (utility.includes(thisBtn.innerHTML)) {
                 thisBtn.classList.add("color--utility")
+                thisBtn.addEventListener("click", function(e) {
+                    switch (e.target.innerHTML) {
+                        case "AC":
+                            clear();
+                        break;
+                        case "+/-":
+                        break;
+                        case "%":
+                        break;
+                    }
+                })
             }
             if (operations.includes(thisBtn.innerHTML)) {
                 thisBtn.classList.add("color--operators")
@@ -80,14 +91,14 @@ for (let btn = 0; btn < btns.length; btn++) {
                             // isOperating ensures input stays on num2 and num is left untouched, should only be false if clearing.
                             isOperating = true;
                             results.innerHTML = "0"
-                            repeatTotal = false;
                         }
+                        doneOperating = false;
                         operation = e.target.innerHTML  
                     }
 
                     // For pressing equal
                     if (e.target.innerHTML === "=") {
-                        if (repeatTotal) {
+                        if (doneOperating) {
                             num = total
                         }
                         // Return num as the total if no num2 found
@@ -99,7 +110,7 @@ for (let btn = 0; btn < btns.length; btn++) {
                         console.log(num, operation, num2);
                         if (!operation || !total) total = num
                     results.innerHTML = total
-                    repeatTotal = true;
+                    doneOperating = true;
                     }
                     resizeResult()
                 }
@@ -119,8 +130,10 @@ function calc(num, operation, num2) {
         case "-":
         return Number(num) - Number(num2);
         case "/":
+            // if (num2 === "0") num2 = 1
         return Number(num) / Number(num2);
         case "*":
+            // if (num2 === "0") num2 = 1
         return Number(num) * Number(num2);
     }
 }
@@ -157,6 +170,45 @@ function resizeResult(isReset) {
 
 
 }
+
+
+function clear() {
+    if (isOperating){
+        if (!num2) {
+            // Wipes if no num2 found
+            console.log("Wipe");
+            isOperating = false;
+            doneOperating = false;
+            num = undefined;
+            num2 = undefined;
+                results.innerHTML = "0"
+        } else {
+            if (doneOperating) {
+                console.log("Wipe");
+                isOperating = false;
+            doneOperating = false;
+                num = undefined;
+                num2 = undefined;
+                results.innerHTML = "0"
+            }
+            else {
+                console.log(num2);
+                console.log("Clear Num2");
+                num2 = undefined
+                results.innerHTML = "0"
+            }
+        }
+    } else {
+        console.log("Wipe");
+        isOperating = false;
+            doneOperating = false;
+        num = undefined;
+        num2 = undefined;
+        results.innerHTML = "0"
+    }
+}
+
+
 
 // Saves (User Input: Step 1 of 2)
 // let input;
