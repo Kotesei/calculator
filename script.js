@@ -15,9 +15,8 @@ let num2;
 let total;
 let repeatTotal;
 
-
 function loadBtns() {
-    let thisBtn;
+let thisBtn;
 const btns = ["AC", "+/-", "%", "/", "7", "8", "9", "*", "4", "5", "6", "-", "1", "2", "3", "+", "0", ".", "="]
 const numerics = ".0123456789"
 const utility = ["AC", "+/-", "%"]
@@ -35,10 +34,10 @@ for (let btn = 0; btn < btns.length; btn++) {
                 thisBtn.addEventListener("click", function(e) {
                     if (isOperating) {
                         num2 = num2 ? num2 + e.target.innerHTML : e.target.innerHTML;
-                    console.log(Number(num) + operation + Number(num2));
+                        results.innerHTML = num2
                     } else {
                     num = num ? num + e.target.innerHTML : e.target.innerHTML;
-                    console.log(num);
+                    results.innerHTML = num
                 }
                 })
             }
@@ -51,16 +50,31 @@ for (let btn = 0; btn < btns.length; btn++) {
 
                     // For operation add, multi, divide, sub
                     if (e.target.innerHTML !== "=") {
-                        operation = e.target.innerHTML
-                        isOperating = true;
+                        
+                        if (isOperating) {
+                            // Should calculate here and continue.
+                            total = calc(num, operation, num2)
+                            results.innerHTML = total
+                            num = total
+                            num2 = 0
+                        }
+                        else {
+                            // isOperating ensures input stays on num2 and num is left untouched, should only be false if clearing.
+                            isOperating = true;
+                            results.innerHTML = "0"
+                            repeatTotal = false;
+                            
+                        }
+                        operation = e.target.innerHTML  
+                        console.log(operation);
                     }
 
                     // For pressing equal
                     if (e.target.innerHTML === "=") {
-                        console.log(operation);
                         if (repeatTotal) {
                             num = total
                         }
+                        // Calculates the total
                     total = calc(num, operation, num2)
                     results.innerHTML = total
                     repeatTotal = true;
