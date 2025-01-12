@@ -9,11 +9,16 @@ const results = resultContainer.querySelector("p");
 const originalfontSize = Number(window.getComputedStyle(results).fontSize.split("px")[0] / 16)
 
 let operation;
+let previousoperation;
 let isOperating
 let canOperate;
 let num;
+let previousnum;
 let num2;
+let previousnum2;
 let total;
+let isFirst;
+let isSecondary;
 let doneOperating;
 let isPercentage;
 let savePercent;
@@ -39,10 +44,15 @@ for (let btn = 0; btn < btns.length; btn++) {
                     if (doneOperating) clear();
                     
                     if (isOperating) {
+                        console.log(num);
+                        isSecondary = true;
+                        isFirst = false
                         if (!num2 && e.target.innerHTML === "0") return
                         num2 = num2 ? num2 + e.target.innerHTML : e.target.innerHTML;
                         results.innerHTML = num2
                     } else {
+                        isSecondary = false
+                        isFirst = true;
                         if (!num && e.target.innerHTML === "0") return
           
                         
@@ -89,18 +99,45 @@ for (let btn = 0; btn < btns.length; btn++) {
 
                     // For operation add, multi, divide, sub
                     if (e.target.innerHTML !== "=") {
-                        console.log(isPercentage);
+                        
+                        // console.log(operation, previousoperation);
+                        if (operation === "*" && !doneOperating && previousoperation) {
+                            if (previousoperation !== "*") {
+                                console.log(operation, previousoperation);
+                                num = calc(num - previousnum2, previousoperation, previousnum2 * num2)
+                            } else {
+                     
+                            total = calc(num, operation, num2)
+                            if (operation === "*" && num2 === 0) total = num
+                            num = total
+                            total = Number(total.toPrecision(5))
+                        }
+                        
+                        results.innerHTML = total
+                        num2 = 0
+                        isPercentage = false;
+                        operation = e.target.innerHTML  
+                        } else {
+                            doneOperating = false;
+                        previousnum = num;
+                        previousnum2 = num2;
                         
                         if (isOperating) {
+                            previousoperation = operation
+                            
                             if (!num) num = 0
                         if (!num2) num2 = 0
                         // Should calculate here and continue.
                         if (num === 0 && num2 === 0) {
                         } else {
                             total = calc(num, operation, num2)
+                            if (operation === "*" && num2 === 0) total = num
+                            total = Number(total.toPrecision(5))
                             results.innerHTML = total
                             num = total
                             num2 = 0
+                            console.log(e.target.innerHTML);
+                            // if (e.target.innerHTML === "*")
                         }
                         }
                         else {
@@ -114,7 +151,7 @@ for (let btn = 0; btn < btns.length; btn++) {
                         isPercentage = false;
                         operation = e.target.innerHTML  
                     }
-
+                }
                     // For pressing equal
                     if (e.target.innerHTML === "=") {
                         console.log(num, num2, total);
@@ -122,21 +159,25 @@ for (let btn = 0; btn < btns.length; btn++) {
                             num = total
                             if (isPercentage) {
                                 console.log("is percentage");
-                                num2 = num * savePercent / 100
-                            } else {
-                            console.log("not percentage");
+                                console.log(num, num2, total);
+                                if (operation !== "*" || operation !== "/") num2 = num * savePercent / 100
                             }
-                            
                         }
                         // Return num as the total if no num2 found
                         if (!num) num = 0
                         if (!num2) num2 = 0
+                        console.log(previousoperation);
+                        console.log(operation);
                         // Calculates the total
                         total = calc(num, operation, num2)
+                        if (operation === "*" && num2 === 0) total = num
+                    if (operation) total = Number(total.toPrecision(5))
                         if (!isFinite(calc(num, operation, num2))) total = Infinity
                         if (!operation || total === undefined) total = num
-                    results.innerHTML = total
-                    doneOperating = true;
+
+                        results.innerHTML = total
+                        doneOperating = true;
+
                     }
                     resizeResult()
                 }
@@ -146,19 +187,14 @@ for (let btn = 0; btn < btns.length; btn++) {
 }
 
 
-
 function percentage() {
-    if (isOperating) {
-        num2 = num * num2 / 100 
-        console.log(num2);
-    } else {
-        num = results.innerHTML / 100;
-    }
+    if (isFirst) num = num / 100
+    else num2 = num2 / 100;
     savePercent = results.innerHTML;
     results.innerHTML = results.innerHTML + "%"
-    console.log(savePercent);
     isPercentage = true;
 }
+
 
 
 loadBtns();
@@ -196,7 +232,7 @@ function resizeResult(isReset) {
     if (fontSize === undefined) fontSize = getTextFontSize;
 
     if (fontSize === 3) {
-        results.innerHTML = "Size Limit!"
+        // results.innerHTML = "Size Limit!"
         sizeLimit = true;
     }
     
@@ -206,8 +242,8 @@ function resizeResult(isReset) {
         results.style.fontSize = `${fontSize}rem`
         resizeResult();
     }
-
-
+    
+    
 }
 
 
@@ -218,19 +254,32 @@ function clear() {
             console.log("Wipe");
             isOperating = false;
             doneOperating = false;
-            isPercentage
+            isPercentage = false;
             num = undefined;
             num2 = undefined;
-                results.innerHTML = "0"
+            total = undefined;
+            previousnum = undefined;
+            previousoperation = undefined
+            
+            results.innerHTML = "0"
+            console.log("test case2");
         } else {
             if (doneOperating) {
                 console.log("Wipe");
                 isOperating = false;
-                isPercentage
-            doneOperating = false;
+                isPercentage = false;
+                doneOperating = false;
+                isSecondary = false;
+                operation = undefined;
                 num = undefined;
                 num2 = undefined;
+                total = undefined;
+                previousnum = undefined;
+                previousoperation = undefined
+                savePercent = undefined
                 results.innerHTML = "0"
+                console.log("test case1");
+               
             }
             else {
                 console.log(num2);
@@ -242,11 +291,15 @@ function clear() {
     } else {
         console.log("Wipe");
         isOperating = false;
-            doneOperating = false;
-            isPercentage
+        doneOperating = false;
+        isPercentage = false
         num = undefined;
         num2 = undefined;
+        total = undefined;
+        previousnum = undefined;
+        previousoperation = undefined;
         results.innerHTML = "0"
+        console.log("test case3");
     }
     resizeResult(true)
 }
