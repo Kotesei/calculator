@@ -110,7 +110,6 @@ for (let btn = 0; btn < btns.length; btn++) {
                         preventChangingOperation = true;
                         doneOperating = false;
                         if (operation === "*" && !doneOperating && previousoperation || operation === "/" && !doneOperating && previousoperation) {
-                            console.log("test");
                             if (operation === "/" || operation === "*") {
                                 num = previousnum
                                 num2 = calc(previousnum2, operation, num2)
@@ -208,9 +207,6 @@ for (let btn = 0; btn < btns.length; btn++) {
                         doneOperating = true;
                         previousnum2 = num2
                         num2 = 0;
-
-                        console.log(num);
-                        console.log(previousnum2);
                     }
                     resizeResult()
                 }
