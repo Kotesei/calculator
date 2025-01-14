@@ -22,6 +22,7 @@ let repeatOperation;
 let isPercentage;
 let savePercent;
 let preventChangingOperation;
+let equalKey;
 
 function loadBtns() {
 let thisBtn;
@@ -30,6 +31,180 @@ const numerics = ".0123456789"
 const utility = ["AC", "+/-", "%"]
 const operations = ["/", "*", "-", "+", "="]
 
+document.addEventListener("keydown", function(e) {
+    if (numerics.includes(e.key)) {
+                    preventChangingOperation = false;
+            
+                    if (sizeLimit) return
+                    if (doneOperating) clear();
+                    
+                    if (isOperating) {
+                    
+                        isSecondary = true;
+                        isFirst = false
+                        if (!num2 && e.key === "0") return
+                        num2 = num2 ? num2 + e.key : e.key;
+                        results.innerHTML = num2
+                    } else {
+                        isSecondary = false
+                        isFirst = true;
+                        if (!num && e.key === "0") return
+          
+                        
+                        
+                    num = num ? num + e.key : e.key;
+                    if (results.innerHTML === ".") results.innerHTML = "0."
+                    results.innerHTML = num
+                }
+                resizeResult()
+    }
+    if (utility.includes(e.key)) {
+        switch (e.key) {
+            case "AC":
+                clear();
+            break;
+            case "+/-":
+                if (doneOperating) return
+                if (sizeLimit) return
+                if (results.innerHTML === "0") return
+                invertNumber();
+                resizeResult()
+                if (num && !num2) {
+                    num = results.innerHTML;
+                }
+                else {
+                    num2 = results.innerHTML
+                }
+                break;
+                case "%":
+                    if (doneOperating) return
+                    if (sizeLimit) return
+                if (results.innerHTML === "0") return
+
+                // Build a function for this 
+                percentage();
+                resizeResult()
+            break;
+        }
+
+    }
+    if (operations.includes(e.key) || e.key === "Enter") {
+        equalKey = undefined;
+        if (e.key === "Enter") equalKey = "="
+        if (sizeLimit) return
+
+        // For operation add, multi, divide, sub
+        if (e.key !== "=" && !equalKey) {
+            
+            if (preventChangingOperation) return                        
+            preventChangingOperation = true;
+            doneOperating = false;
+            equalKey = undefined;
+            if (operation === "*" && !doneOperating && previousoperation || operation === "/" && !doneOperating && previousoperation) {
+                if (operation === "/" || operation === "*") {
+                    num = previousnum
+                    num2 = calc(previousnum2, operation, num2)
+                    previousnum2 = num2
+                    total = Math.floor(calc(num, previousoperation, num2) * 10000) / 10000
+                    num = total
+                }
+              
+            
+            results.innerHTML = total
+            num2 = 0
+            isPercentage = false;
+            operation = e.key  
+            } else {
+            previousnum = num;
+            previousnum2 = num2;
+            
+            if (isOperating) {
+                previousoperation = operation
+                
+                if (!num) num = 0
+            if (!num2) num2 = 0
+            // Should calculate here and continue.
+            if (num === 0 && num2 === 0) {
+            } else {
+                total = calc(num, operation, num2)
+                if (operation === "*" && num2 === 0) total = num
+                total = Math.floor(total * 10000) / 10000
+                results.innerHTML = total
+                num = total
+                num2 = 0
+             
+                // if (e.key === "*")
+            }
+            }
+            else {
+                if (!num) num = 0
+                
+                // isOperating ensures input stays on num2 and num is left untouched, should only be false if clearing.
+                isOperating = true;
+                results.innerHTML = "0"
+            }
+            isPercentage = false;
+            operation = e.key  
+        }
+    }
+        // For pressing equal
+        console.log(equalKey);
+        if (e.key === "=" || equalKey === "=") {
+            console.log("test");
+            preventChangingOperation = false;
+            isOperating = false;
+            if (doneOperating) {
+                
+                repeatOperation = true;
+     
+                num = total
+                num2 = previousnum2
+                
+            } 
+
+      
+            if (!repeatOperation) {
+                if (operation === "*" && !doneOperating && previousoperation || operation === "/" && !doneOperating && previousoperation) {
+                    if (operation === "/" || operation === "*") {
+                    
+                        num = previousnum
+                        num2 = calc(previousnum2, operation, num2)
+                  
+                        previousnum2 = num2
+                        total = Math.floor(calc(num, previousoperation, num2) * 10000) / 10000
+                        operation = previousoperation
+                    }
+        }
+    }
+
+                     // Return num as the total if no num2 found
+            if (!num) num = 0
+            if (!num2) num2 = 0
+        
+            // Calculates the total
+            total = calc(num, operation, num2)
+            num = total
+            
+         
+            if (operation === "*" && num2 === 0) total = num
+        if (operation) total = Math.floor(total * 10000) / 10000
+            if (!isFinite(calc(num, operation, num2))) total = Infinity
+            if (!operation || total === undefined) {
+                num = results.innerHTML
+                total = num
+            }
+        
+            results.innerHTML = total
+            
+         
+            doneOperating = true;
+            previousnum2 = num2
+            num2 = 0;
+        }
+        resizeResult()
+    }
+})
+
 for (let btn = 0; btn < btns.length; btn++) {
     btnsContainer.insertAdjacentHTML("beforeend", `<button class="btn">${btns[btn]}</button>`)    
     thisBtn = document.querySelectorAll(".btn")[btn]
@@ -37,8 +212,11 @@ for (let btn = 0; btn < btns.length; btn++) {
         thisBtn.style.flex = "1"
     }
 
+  
+
     if (numerics.includes(thisBtn.innerHTML)) {
                 thisBtn.classList.add("color--numerics")
+                
                 thisBtn.addEventListener("click", function(e) {
                     preventChangingOperation = false;
             
