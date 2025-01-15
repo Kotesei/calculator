@@ -22,7 +22,8 @@ let repeatOperation;
 let isPercentage;
 let savePercent;
 let preventChangingOperation;
-let equalKey;
+let operationKeys;
+let allowDeleting;
 
 function loadBtns() {
 let thisBtn;
@@ -32,11 +33,23 @@ const utility = ["AC", "+/-", "%"]
 const operations = ["/", "*", "-", "+", "="]
 
 document.addEventListener("keydown", function(e) {
+    if (e.key === "Backspace" && !doneOperating) {
+        if (!allowDeleting) return
+        const delValue = results.innerHTML.split("")
+        delValue.pop();
+       results.innerHTML = delValue.join("");
+       if (!delValue[0]) results.innerHTML = "0"
+       if (isFirst) num = delValue.join("")
+        if (isSecondary) num2 = delValue.join("")
+
+    }
     if (numerics.includes(e.key)) {
+        allowDeleting = true;
                     preventChangingOperation = false;
             
                     if (sizeLimit) return
                     if (doneOperating) clear();
+                    
                     
                     if (isOperating) {
                     
@@ -62,6 +75,7 @@ document.addEventListener("keydown", function(e) {
         switch (e.key) {
             case "AC":
                 clear();
+                
             break;
             case "+/-":
                 if (doneOperating) return
@@ -89,118 +103,115 @@ document.addEventListener("keydown", function(e) {
 
     }
     if (operations.includes(e.key) || e.key === "Enter") {
-        equalKey = undefined;
-        if (e.key === "Enter") equalKey = "="
+        operationKeys = e.key
+        if (e.key === "Enter") operationKeys = "="
         if (sizeLimit) return
 
-        // For operation add, multi, divide, sub
-        if (e.key !== "=" && !equalKey) {
-            
-            if (preventChangingOperation) return                        
-            preventChangingOperation = true;
-            doneOperating = false;
-            equalKey = undefined;
-            if (operation === "*" && !doneOperating && previousoperation || operation === "/" && !doneOperating && previousoperation) {
-                if (operation === "/" || operation === "*") {
-                    num = previousnum
-                    num2 = calc(previousnum2, operation, num2)
-                    previousnum2 = num2
-                    total = Math.floor(calc(num, previousoperation, num2) * 10000) / 10000
-                    num = total
-                }
-              
-            
-            results.innerHTML = total
-            num2 = 0
-            isPercentage = false;
-            operation = e.key  
-            } else {
-            previousnum = num;
-            previousnum2 = num2;
-            
-            if (isOperating) {
-                previousoperation = operation
-                
-                if (!num) num = 0
-            if (!num2) num2 = 0
-            // Should calculate here and continue.
-            if (num === 0 && num2 === 0) {
-            } else {
-                total = calc(num, operation, num2)
-                if (operation === "*" && num2 === 0) total = num
-                total = Math.floor(total * 10000) / 10000
-                results.innerHTML = total
-                num = total
-                num2 = 0
-             
-                // if (e.key === "*")
-            }
-            }
-            else {
-                if (!num) num = 0
-                
-                // isOperating ensures input stays on num2 and num is left untouched, should only be false if clearing.
-                isOperating = true;
-                results.innerHTML = "0"
-            }
-            isPercentage = false;
-            operation = e.key  
-        }
-    }
-        // For pressing equal
-        console.log(equalKey);
-        if (e.key === "=" || equalKey === "=") {
-            console.log("test");
-            preventChangingOperation = false;
-            isOperating = false;
-            if (doneOperating) {
-                
-                repeatOperation = true;
-     
-                num = total
-                num2 = previousnum2
-                
-            } 
-
-      
-            if (!repeatOperation) {
-                if (operation === "*" && !doneOperating && previousoperation || operation === "/" && !doneOperating && previousoperation) {
-                    if (operation === "/" || operation === "*") {
-                    
-                        num = previousnum
-                        num2 = calc(previousnum2, operation, num2)
-                  
-                        previousnum2 = num2
-                        total = Math.floor(calc(num, previousoperation, num2) * 10000) / 10000
-                        operation = previousoperation
+                    // For operation add, multi, divide, sub
+                    if (operationKeys !== "=") {
+                        if (preventChangingOperation) return                        
+                        preventChangingOperation = true;
+                        doneOperating = false;
+                        if (operation === "*" && !doneOperating && previousoperation || operation === "/" && !doneOperating && previousoperation) {
+                            if (operation === "/" || operation === "*") {
+                                num = previousnum
+                                num2 = calc(previousnum2, operation, num2)
+                                previousnum2 = num2
+                                total = Math.floor(calc(num, previousoperation, num2) * 10000) / 10000
+                                num = total
+                            }
+                          
+                        
+                        results.innerHTML = total
+                        num2 = 0
+                        isPercentage = false;
+                        operation = operationKeys  
+                        } else {
+                        previousnum = num;
+                        previousnum2 = num2;
+                        
+                        if (isOperating) {
+                            previousoperation = operation
+                            
+                            if (!num) num = 0
+                        if (!num2) num2 = 0
+                        // Should calculate here and continue.
+                        if (num === 0 && num2 === 0) {
+                        } else {
+                            total = calc(num, operation, num2)
+                            if (operation === "*" && num2 === 0) total = num
+                            total = Math.floor(total * 10000) / 10000
+                            results.innerHTML = total
+                            num = total
+                            num2 = 0
+                         
+                            // if (operationKeys === "*")
+                        }
+                        }
+                        else {
+                            if (!num) num = 0
+                            
+                            // isOperating ensures input stays on num2 and num is left untouched, should only be false if clearing.
+                            isOperating = true;
+                            results.innerHTML = "0"
+                        }
+                        isPercentage = false;
+                        operation = operationKeys  
                     }
-        }
-    }
+                }
+                    // For pressing equal
+                    if (operationKeys === "=") {
+                        preventChangingOperation = false;
+                        isOperating = false;
+                        if (doneOperating) {
+                            
+                            repeatOperation = true;
+                 
+                            num = total
+                            num2 = previousnum2
+                            
+                        } 
 
-                     // Return num as the total if no num2 found
-            if (!num) num = 0
-            if (!num2) num2 = 0
-        
-            // Calculates the total
-            total = calc(num, operation, num2)
-            num = total
-            
-         
-            if (operation === "*" && num2 === 0) total = num
-        if (operation) total = Math.floor(total * 10000) / 10000
-            if (!isFinite(calc(num, operation, num2))) total = Infinity
-            if (!operation || total === undefined) {
-                num = results.innerHTML
-                total = num
-            }
-        
-            results.innerHTML = total
-            
-         
-            doneOperating = true;
-            previousnum2 = num2
-            num2 = 0;
-        }
+                  
+                        if (!repeatOperation) {
+                            if (operation === "*" && !doneOperating && previousoperation || operation === "/" && !doneOperating && previousoperation) {
+                                if (operation === "/" || operation === "*") {
+                                
+                                    num = previousnum
+                                    num2 = calc(previousnum2, operation, num2)
+                              
+                                    previousnum2 = num2
+                                    total = Math.floor(calc(num, previousoperation, num2) * 10000) / 10000
+                                    operation = previousoperation
+                                }
+                    }
+                }
+
+                                 // Return num as the total if no num2 found
+                        if (!num) num = 0
+                        if (!num2) num2 = 0
+                    
+                        // Calculates the total
+                        total = calc(num, operation, num2)
+                        num = total
+                        
+                     
+                        if (operation === "*" && num2 === 0) total = num
+                    if (operation) total = Math.floor(total * 10000) / 10000
+                        if (!isFinite(calc(num, operation, num2))) total = Infinity
+                        if (!operation || total === undefined) {
+                            num = results.innerHTML
+                            total = num
+                        }
+                    
+                        results.innerHTML = total
+                        
+                     
+                        doneOperating = true;
+                        previousnum2 = num2
+                        num2 = 0;
+                       
+                    }
         resizeResult()
     }
 })
@@ -218,10 +229,12 @@ for (let btn = 0; btn < btns.length; btn++) {
                 thisBtn.classList.add("color--numerics")
                 
                 thisBtn.addEventListener("click", function(e) {
+                    e.target.blur();
                     preventChangingOperation = false;
             
                     if (sizeLimit) return
                     if (doneOperating) clear();
+                    
                     
                     if (isOperating) {
                     
@@ -248,6 +261,7 @@ for (let btn = 0; btn < btns.length; btn++) {
             if (utility.includes(thisBtn.innerHTML)) {
                 thisBtn.classList.add("color--utility")
                 thisBtn.addEventListener("click", function(e) {
+                    e.target.blur();
                     switch (e.target.innerHTML) {
                         case "AC":
                             clear();
@@ -280,10 +294,12 @@ for (let btn = 0; btn < btns.length; btn++) {
             if (operations.includes(thisBtn.innerHTML)) {
                 thisBtn.classList.add("color--operators")
                 thisBtn.addEventListener("click", function(e) {
+                    e.target.blur();
+                    operationKeys = e.target.innerHTML;
                     if (sizeLimit) return
 
                     // For operation add, multi, divide, sub
-                    if (e.target.innerHTML !== "=") {
+                    if (operationKeys !== "=") {
                         if (preventChangingOperation) return                        
                         preventChangingOperation = true;
                         doneOperating = false;
@@ -299,8 +315,9 @@ for (let btn = 0; btn < btns.length; btn++) {
                         
                         results.innerHTML = total
                         num2 = 0
+                        
                         isPercentage = false;
-                        operation = e.target.innerHTML  
+                        operation = operationKeys  
                         } else {
                         previousnum = num;
                         previousnum2 = num2;
@@ -319,8 +336,9 @@ for (let btn = 0; btn < btns.length; btn++) {
                             results.innerHTML = total
                             num = total
                             num2 = 0
+                            
                          
-                            // if (e.target.innerHTML === "*")
+                            // if (operationKeys === "*")
                         }
                         }
                         else {
@@ -331,11 +349,11 @@ for (let btn = 0; btn < btns.length; btn++) {
                             results.innerHTML = "0"
                         }
                         isPercentage = false;
-                        operation = e.target.innerHTML  
+                        operation = operationKeys  
                     }
                 }
                     // For pressing equal
-                    if (e.target.innerHTML === "=") {
+                    if (operationKeys === "=") {
                         preventChangingOperation = false;
                         isOperating = false;
                         if (doneOperating) {
@@ -459,33 +477,41 @@ function clear() {
         if (!num2) {
             // Wipes if no num2 found
        
-            isOperating = false;
-            doneOperating = false;
-            isPercentage = false;
-            num = undefined;
-            num2 = undefined;
-            total = undefined;
-            previousnum = undefined;
-            previousoperation = undefined
-            operation = undefined
-            
-            results.innerHTML = "0"
+            isFirst = true;
+                isSecondary = false;
+                isOperating = false;
+                doneOperating = false;
+                isPercentage = false
+                preventChangingOperation = false;
+                    allowDeleting = true;
+                    operationKeys = undefined;
+                    num = undefined;
+                    num2 = undefined;
+                    total = undefined;
+                previousnum = undefined;
+                previousnum2 = undefined
+                previousoperation = undefined;
+                operation = undefined
+                results.innerHTML = "0"
        
         } else {
             if (doneOperating) {
                
-                isOperating = false;
-                isPercentage = false;
-                doneOperating = false;
+                isFirst = true;
                 isSecondary = false;
-                operation = undefined;
-                num = undefined;
-                num2 = undefined;
-                total = undefined;
+                isOperating = false;
+                doneOperating = false;
+                isPercentage = false
+                preventChangingOperation = false;
+                    allowDeleting = true;
+                    operationKeys = undefined;
+                    num = undefined;
+                    num2 = undefined;
+                    total = undefined;
                 previousnum = undefined;
-                previousoperation = undefined
+                previousnum2 = undefined
+                previousoperation = undefined;
                 operation = undefined
-                savePercent = undefined
                 results.innerHTML = "0"
           
                
@@ -497,17 +523,24 @@ function clear() {
             }
         }
     } else {
-
+    
+        isFirst = true;
+        isSecondary = false;
         isOperating = false;
         doneOperating = false;
         isPercentage = false
-        num = undefined;
-        num2 = undefined;
-        total = undefined;
+        preventChangingOperation = false;
+            allowDeleting = true;
+            operationKeys = undefined;
+            num = undefined;
+            num2 = undefined;
+            total = undefined;
         previousnum = undefined;
+        previousnum2 = undefined
         previousoperation = undefined;
         operation = undefined
         results.innerHTML = "0"
+        
 
     }
     resizeResult(true)
